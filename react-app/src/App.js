@@ -1,13 +1,16 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import MIDISounds from "midi-sounds-react";
 import tones from "./tones.json";
 import triads from "./triads.json";
 import parent_sets from "./parent_sets.json";
+import metadata from "./mela_meta.json";
 
+import { Card, Button } from "semantic-ui-react";
+
+console.log(metadata);
 // const INSTRUMENT = 124; // Marimba
-const INSTRUMENT = 4; // Piano
+const INSTRUMENT = 3; // Piano
 const ROOT = 58;
 const NOTES = [60, 62, 64, 66];
 const b = 0.35;
@@ -17,12 +20,11 @@ export default class App extends Component {
     super(props);
   }
 
-  playPositions = (positions) => {
+  playTones = (idx) => {
     this.midiSounds.setMasterVolume(0.4);
     var when = this.midiSounds.contextTime();
-    const notes = positions.map((i) => ROOT + i);
+    const notes = tones[idx].map((i) => ROOT + i);
     notes.forEach((n, idx) => {
-      console.log(idx);
       this.midiSounds.playChordAt(when + b * idx, INSTRUMENT, [n], 0.8 * b);
     });
   };
@@ -52,9 +54,28 @@ export default class App extends Component {
       <div className="App">
         <h2>All Melakartas</h2>
         <p>
-          {triads.map((tr, i) => (
-            <button onClick={() => this.playTriads(i)}>{i + 1}</button>
-          ))}
+          <Card.Group>
+            {triads.map((tr, i) => (
+              <Card>
+                <Card.Header>
+                  {i + 1}: {metadata[i]["Name"]}
+                </Card.Header>
+                {/* <Card.Content>
+                  {tones[i].join(", ")}
+                  <br />
+                  {triads[i].join(", ")}
+                </Card.Content> */}
+                <Button.Group>
+                  <Button basic color="grey" onClick={() => this.playTones(i)}>
+                    Tones
+                  </Button>
+                  <Button basic color="grey" onClick={() => this.playTriads(i)}>
+                    Chords
+                  </Button>
+                </Button.Group>
+              </Card>
+            ))}
+          </Card.Group>
         </p>
 
         <h2>Parent scales</h2>
@@ -73,7 +94,7 @@ export default class App extends Component {
         <MIDISounds
           ref={(ref) => (this.midiSounds = ref)}
           appElementName="root"
-          instruments={[3]}
+          instruments={[3, 124]}
         />
       </div>
     );
